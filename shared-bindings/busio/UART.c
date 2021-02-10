@@ -109,11 +109,11 @@ STATIC mp_obj_t busio_uart_make_new(const mp_obj_type_t *type, size_t n_args, co
     if ( (tx == NULL) && (rx == NULL) ) {
         mp_raise_ValueError(translate("tx and rx cannot both be None"));
     }
-
-    uint8_t bits = args[ARG_bits].u_int;
-    if (bits < 7 || bits > 9) {
-        mp_raise_ValueError(translate("bits must be 7, 8 or 9"));
+ 
+    if (args[ARG_bits].u_int < 0) {
+        mp_raise_ValueError(translate("bits must be > 0"));
     }
+    uint8_t bits = args[ARG_bits].u_int;
 
     busio_uart_parity_t parity = BUSIO_UART_PARITY_NONE;
     if (args[ARG_parity].u_obj == &busio_uart_parity_even_obj) {

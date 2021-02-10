@@ -335,6 +335,10 @@ msgstr ""
 msgid "All UART peripherals are in use"
 msgstr ""
 
+#: ports/raspberrypi/common-hal/busio/UART.c
+msgid "All UART peripherals in use"
+msgstr ""
+
 #: ports/atmel-samd/common-hal/audioio/AudioOut.c
 msgid "All event channels in use"
 msgstr ""
@@ -458,6 +462,10 @@ msgstr ""
 
 #: shared-bindings/audiobusio/PDMIn.c
 msgid "Bit depth must be multiple of 8."
+msgstr ""
+
+#: ports/raspberrypi/common-hal/busio/UART.c
+msgid "Bits must be between 5 and 8"
 msgstr ""
 
 #: ports/mimxrt10xx/common-hal/busio/UART.c
@@ -1148,7 +1156,8 @@ msgstr ""
 msgid "Invalid bits per value"
 msgstr ""
 
-#: ports/nrf/common-hal/busio/UART.c ports/stm/common-hal/busio/UART.c
+#: ports/nrf/common-hal/busio/UART.c ports/raspberrypi/common-hal/busio/UART.c
+#: ports/stm/common-hal/busio/UART.c
 msgid "Invalid buffer size"
 msgstr ""
 
@@ -1225,6 +1234,9 @@ msgstr ""
 #: ports/mimxrt10xx/common-hal/busio/I2C.c
 #: ports/mimxrt10xx/common-hal/busio/SPI.c
 #: ports/mimxrt10xx/common-hal/busio/UART.c ports/nrf/common-hal/busio/I2C.c
+#: ports/raspberrypi/common-hal/busio/I2C.c
+#: ports/raspberrypi/common-hal/busio/SPI.c
+#: ports/raspberrypi/common-hal/busio/UART.c
 msgid "Invalid pins"
 msgstr ""
 
@@ -1682,6 +1694,10 @@ msgstr ""
 #: ports/esp32s2/common-hal/busio/UART.c
 #: ports/mimxrt10xx/common-hal/busio/UART.c
 msgid "RS485 inversion specified when not in RS485 mode"
+msgstr ""
+
+#: ports/raspberrypi/common-hal/busio/UART.c
+msgid "RS485 is not supported on this board"
 msgstr ""
 
 #: ports/cxd56/common-hal/rtc/RTC.c ports/esp32s2/common-hal/rtc/RTC.c
@@ -2292,7 +2308,7 @@ msgid "binary op %q not implemented"
 msgstr ""
 
 #: shared-bindings/busio/UART.c
-msgid "bits must be 7, 8 or 9"
+msgid "bits must be > 0"
 msgstr ""
 
 #: shared-bindings/audiomixer/Mixer.c
