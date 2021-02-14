@@ -258,8 +258,8 @@ def hotas_hid_descriptor(report_id):
              0x09, 0x01, # usage: pointer ?!?
              0x16, 0x01, 0x80, # logical minimum: -32767
              0x26, 0xff, 0x7f, # logical maximum: 32767
-             0x75, 0x10 # report size (16)
-             0x95, 0x06  # 6 axes
+             0x75, 0x10, # report size (16)
+             0x95, 0x06,  # 6 axes
 
              0xa1, 0x00, # physical section
 
@@ -270,7 +270,7 @@ def hotas_hid_descriptor(report_id):
              0x09, 0x34,  # ry axis
              0x09, 0x35,  # rz axis
 
-             0x81, 0x02 # end input
+             0x81, 0x02, # end input
              0xc0 # end physical collection
             )))
 
