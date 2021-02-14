@@ -25,6 +25,7 @@ HID_DEVICE_DATA = {
     "CONSUMER" : DeviceData(report_length=2, out_report_length=0, usage_page=0x0C, usage=0x01),    # Consumer, Consumer Control
     "SYS_CONTROL" : DeviceData(report_length=1, out_report_length=0, usage_page=0x01, usage=0x80), # Generic Desktop, Sys Control
     "GAMEPAD" : DeviceData(report_length=6, out_report_length=0, usage_page=0x01, usage=0x05),     # Generic Desktop, Game Pad
+    "THROTTLE": DeviceData(report_length=11, out_report_length=0, usage_page=0x01, usage=0x04),      # Custom HOTAS throttle
     "DIGITIZER" : DeviceData(report_length=5, out_report_length=0, usage_page=0x0D, usage=0x02),   # Digitizers, Pen
     "XAC_COMPATIBLE_GAMEPAD" : DeviceData(report_length=3, out_report_length=0, usage_page=0x01, usage=0x05), # Generic Desktop, Game Pad
     "RAW" : DeviceData(report_length=64, out_report_length=0, usage_page=0xFFAF, usage=0xAF),      # Vendor 0xFFAF "Adafruit", 0xAF
@@ -155,6 +156,74 @@ def sys_control_hid_descriptor(report_id):
              0x75, 0x06,        #   Report Size (6)
              0x81, 0x03,        #   Input (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
              0xC0,              # End Collection
+            )))
+
+def throttle_hid_descriptor(report_id):
+    data = HID_DEVICE_DATA["THROTTLE"]
+    return hid.ReportDescriptor(
+        description="THROTTLE",
+        report_descriptor=bytes(
+            # Hotas with 2 Slew axis, 1 throttle axis,
+            # 24 buttons, 2 hat switches
+            #
+            # 24 bits for buttons (3)
+            # 1 byte each for hat switch (2)
+            # 2 byte each for 3 axis (6)
+            #
+            # = 11 bytes
+            (0x05, data.usage_page, # usage ( usage page)
+             0x09, data.usage, # usage (joystick I think)
+             0xA1, 0x01
+            ) +
+            ((0x85, report_id) if report_id != 0 else ()) +
+            (0x05, 0x09,        #   Usage Page (Buttons)
+             0x19, 0x01,        #   Usage Minimum (Button 1)
+             0x29, 0x18,        #   Usage Maximum (Button 24)
+             0x15, 0x00,        #   Logical Minimum (0)
+             0x25, 0x01,        #   Logical Maximum (1)
+             0x75, 0x01,        #   Report Size (1)
+             0x95, 0x18,        #   Report Count (24)
+             0x81, 0x02,        #   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+
+             # usage page: generic desktop controls
+             0x05, 0x01,
+             # hat switch 1
+             0x09, 0x39, # hat switch
+             0x15, 0x00, # logical minimum 0
+             0x25, 0x07, # logical maximum 7
+             0x35, 0x00, # physical minimum 0
+             0x46, 0x38, 0x01, # Physical maximium 315 ???
+             0x65, 0x14, # unit ( eng rot: angular pos)
+             0x74, 0x04, # report size 4
+             0x95, 0x01, # report size 1
+             0x81, 0x02,        #   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+
+             # hat switch 2
+             0x09, 0x39, # hat switch
+             0x15, 0x00, # logical minimum 0
+             0x25, 0x07, # logical maximum 7
+             0x35, 0x00, # physical minimum 0
+             0x46, 0x38, 0x01, # Physical maximium 315 ???
+             0x65, 0x14, # unit ( eng rot: angular pos)
+             0x74, 0x04, # report size 4
+             0x95, 0x01, # report size 1
+             0x81, 0x02,        #   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)#
+
+             # axes
+             0x09, 0x01, # usage: pointer ?!?
+             0x16, 0x01, 0x80, # logical minimum: -32767
+             0x26, 0xff, 0x7f, # logical maximum: 32767
+             0x75, 0x10 # report size (16)
+             0x95, 0x3  # 3 axes
+
+             0xa1, 0x00, # physical section
+
+             0x09, 0x30,  # x axis
+             0x09, 0x31,  # y axis
+             0x09, 0x32,  # z axis
+
+             0x81, 0x02 # end input
+             0xc0 # end physical collection
             )))
 
 def gamepad_hid_descriptor(report_id):
@@ -289,6 +358,7 @@ REPORT_DESCRIPTOR_FUNCTIONS = {
     "CONSUMER" : consumer_hid_descriptor,
     "SYS_CONTROL" : sys_control_hid_descriptor,
     "GAMEPAD" : gamepad_hid_descriptor,
+    "THROTTLE": throttle_hid_descriptor,
     "DIGITIZER" : digitizer_hid_descriptor,
     "XAC_COMPATIBLE_GAMEPAD" : xac_compatible_gamepad_hid_descriptor,
     "RAW" : raw_hid_descriptor,
