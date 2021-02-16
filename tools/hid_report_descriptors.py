@@ -24,8 +24,7 @@ HID_DEVICE_DATA = {
     "MOUSE" : DeviceData(report_length=4, out_report_length=0, usage_page=0x01, usage=0x02),       # Generic Desktop, Mouse
     "CONSUMER" : DeviceData(report_length=2, out_report_length=0, usage_page=0x0C, usage=0x01),    # Consumer, Consumer Control
     "SYS_CONTROL" : DeviceData(report_length=1, out_report_length=0, usage_page=0x01, usage=0x80), # Generic Desktop, Sys Control
-    "GAMEPAD" : DeviceData(report_length=6, out_report_length=0, usage_page=0x01, usage=0x05),     # Generic Desktop, Game Pad
-    "HOTAS": DeviceData(report_length=22, out_report_length=0, usage_page=0x01, usage=0x04),      # Custom HOTAS throttle
+    "GAMEPAD" : DeviceData(report_length=19, out_report_length=0, usage_page=0x01, usage=0x05),     # Generic Desktop, Game Pad
     "DIGITIZER" : DeviceData(report_length=5, out_report_length=0, usage_page=0x0D, usage=0x02),   # Digitizers, Pen
     "XAC_COMPATIBLE_GAMEPAD" : DeviceData(report_length=3, out_report_length=0, usage_page=0x01, usage=0x05), # Generic Desktop, Game Pad
     "RAW" : DeviceData(report_length=64, out_report_length=0, usage_page=0xFFAF, usage=0xAF),      # Vendor 0xFFAF "Adafruit", 0xAF
@@ -158,11 +157,11 @@ def sys_control_hid_descriptor(report_id):
              0xC0,              # End Collection
             )))
 
-def hotas_hid_descriptor(report_id):
-    data = HID_DEVICE_DATA["HOTAS"]
+def gamepad_hid_descriptor(report_id):
+    data = HID_DEVICE_DATA["GAMEPAD"]
     return hid.ReportDescriptor(
-        description="HOTAS",
-        report_descriptor=bytes(
+        description="GAMEPAD",
+                report_descriptor=bytes(
             # Hotas with 2 Slew axis, 1 throttle axis,
             # 32 buttons, 6 hat switches
             #
@@ -178,11 +177,14 @@ def hotas_hid_descriptor(report_id):
             ((0x85, report_id) if report_id != 0 else ()) +
             (0x05, 0x09,        #   Usage Page (Buttons)
              0x19, 0x01,        #   Usage Minimum (Button 1)
-             0x29, 0x18,        #   Usage Maximum (Button 32)
+             0x29, 0x20,        #   Usage Maximum (Button 32)
              0x15, 0x00,        #   Logical Minimum (0)
              0x25, 0x01,        #   Logical Maximum (1)
              0x75, 0x01,        #   Report Size (1)
              0x95, 0x20,        #   Report Count (32)
+             0x55, 0x00, # unix exponent 0
+             0x65, 0x00, # unit none
+
              0x81, 0x02,        #   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
 
              # usage page: generic desktop controls
@@ -204,7 +206,7 @@ def hotas_hid_descriptor(report_id):
              0x15, 0x00, # logical minimum 0
              0x25, 0x07, # logical maximum 7
              0x35, 0x00, # physical minimum 0
-             0x46, 0x38, 0x01, # Physical maximium 315 ???
+             0x46, 0x3B, 0x01, # Physical maximium 315 ???
              0x65, 0x14, # unit ( eng rot: angular pos)
              0x75, 0x04, # report size 4
              0x95, 0x01, # report size 1
@@ -215,7 +217,7 @@ def hotas_hid_descriptor(report_id):
              0x15, 0x00, # logical minimum 0
              0x25, 0x07, # logical maximum 7
              0x35, 0x00, # physical minimum 0
-             0x46, 0x38, 0x01, # Physical maximium 315 ???
+             0x46, 0x3B, 0x01, # Physical maximium 315 ???
              0x65, 0x14, # unit ( eng rot: angular pos)
              0x75, 0x04, # report size 4
              0x95, 0x01, # report size 1
@@ -226,7 +228,7 @@ def hotas_hid_descriptor(report_id):
              0x15, 0x00, # logical minimum 0
              0x25, 0x07, # logical maximum 7
              0x35, 0x00, # physical minimum 0
-             0x46, 0x38, 0x01, # Physical maximium 315 ???
+             0x46, 0x3B, 0x01, # Physical maximium 315 ???
              0x65, 0x14, # unit ( eng rot: angular pos)
              0x75, 0x04, # report size 4
              0x95, 0x01, # report size 1
@@ -237,7 +239,7 @@ def hotas_hid_descriptor(report_id):
              0x15, 0x00, # logical minimum 0
              0x25, 0x07, # logical maximum 7
              0x35, 0x00, # physical minimum 0
-             0x46, 0x38, 0x01, # Physical maximium 315 ???
+             0x46, 0x3B, 0x01, # Physical maximium 315 ???
              0x65, 0x14, # unit ( eng rot: angular pos)
              0x75, 0x04, # report size 4
              0x95, 0x01, # report size 1
@@ -248,7 +250,7 @@ def hotas_hid_descriptor(report_id):
              0x15, 0x00, # logical minimum 0
              0x25, 0x07, # logical maximum 7
              0x35, 0x00, # physical minimum 0
-             0x46, 0x38, 0x01, # Physical maximium 315 ???
+             0x46, 0x3B, 0x01, # Physical maximium 315 ???
              0x65, 0x14, # unit ( eng rot: angular pos)
              0x75, 0x04, # report size 4
              0x95, 0x01, # report size 1
@@ -271,39 +273,7 @@ def hotas_hid_descriptor(report_id):
              0x09, 0x35,  # rz axis
 
              0x81, 0x02, # end input
-             0xc0 # end physical collection
-            )))
-
-def gamepad_hid_descriptor(report_id):
-    data = HID_DEVICE_DATA["GAMEPAD"]
-    return hid.ReportDescriptor(
-        description="GAMEPAD",
-        report_descriptor=bytes(
-            # Gamepad with 16 buttons and two joysticks
-            (0x05, data.usage_page, # Usage Page (Generic Desktop Ctrls)
-             0x09, data.usage,  # Usage (Game Pad)
-             0xA1, 0x01,        # Collection (Application)
-            ) +
-            ((0x85, report_id) if report_id != 0 else ()) +
-            (0x05, 0x09,        #   Usage Page (Button)
-             0x19, 0x01,        #   Usage Minimum (Button 1)
-             0x29, 0x10,        #   Usage Maximum (Button 16)
-             0x15, 0x00,        #   Logical Minimum (0)
-             0x25, 0x01,        #   Logical Maximum (1)
-             0x75, 0x01,        #   Report Size (1)
-             0x95, 0x10,        #   Report Count (16)
-             0x81, 0x02,        #   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
-             0x05, 0x01,        #   Usage Page (Generic Desktop Ctrls)
-             0x15, 0x81,        #   Logical Minimum (-127)
-             0x25, 0x7F,        #   Logical Maximum (127)
-             0x09, 0x30,        #   Usage (X)
-             0x09, 0x31,        #   Usage (Y)
-             0x09, 0x32,        #   Usage (Z)
-             0x09, 0x35,        #   Usage (Rz)
-             0x75, 0x08,        #   Report Size (8)
-             0x95, 0x04,        #   Report Count (4)
-             0x81, 0x02,        #   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
-             0xC0,              # End Collection
+             0xc0, 0xc0, # end physical collection
             )))
 
 def digitizer_hid_descriptor(report_id):
@@ -406,7 +376,6 @@ REPORT_DESCRIPTOR_FUNCTIONS = {
     "CONSUMER" : consumer_hid_descriptor,
     "SYS_CONTROL" : sys_control_hid_descriptor,
     "GAMEPAD" : gamepad_hid_descriptor,
-    "HOTAS": hotas_hid_descriptor,
     "DIGITIZER" : digitizer_hid_descriptor,
     "XAC_COMPATIBLE_GAMEPAD" : xac_compatible_gamepad_hid_descriptor,
     "RAW" : raw_hid_descriptor,
